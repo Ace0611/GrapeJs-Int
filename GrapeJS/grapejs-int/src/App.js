@@ -1,65 +1,87 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
-// import 'grapesjs/dist/css/grapes.min.css';
-import grapesjs from 'grapesjs';
+import React from "react";
+import "./App.css";
+import "grapesjs/dist/css/grapes.min.css";
+import grapesjs from "grapesjs";
+import grapesjsPreset from "grapesjs-preset-webpage";
+import { assets } from "./assets";
 
 function App() {
   const editor = grapesjs.init({
-    container: '#gjs',
+    container: "#gjs",
     fromElement: true,
-    height: '300px',
-    width: 'auto',
+    height: "500px",
+    width: "auto",
     storageManager: false,
     panels: { defaults: [] },
-    blockManager: {
-      appendTo: '#blocks',
-      blocks: [
-        {
-          id: 'section', // id is mandatory
-          label: '<b>Section</b>', // You can use HTML/SVG inside labels
-          attributes: { class:'gjs-block-section' },
-          content: `<section>
-            <h1>This is a simple title</h1>
-            <div>This is just a Lorem text: Lorem ipsum dolor sit amet</div>
-          </section>`,
-        }, {
-          id: 'text',
-          label: 'Text',
-          content: '<div data-gjs-type="text">Insert your text here</div>',
-        }, {
-          id: 'image',
-          label: 'Image',
-          // Select the component once it's dropped
-          select: true,
-          // You can pass components as a JSON instead of a simple HTML string,
-          // in this case we also use a defined component type `image`
-          content: { type: 'image' },
-          // This triggers `active` event on dropped components and the `image`
-          // reacts by opening the AssetManager
-          activate: true,
-        }
-      ]
-    },
+    plugins: [grapesjsPreset],
+    assetManager: assets
   });
-  return (
-    <div className="App">
-      {/* <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header> */}
-    </div>
-  );
+  window.editor = editor;
+  const am = editor.AssetManager;
+  const blockManager = editor.BlockManager;
+  const commands = editor.Commands;
+
+  commands.add("my-command-id", {
+    run(editor) {
+      alert("This Command is now active");
+    },
+    stop(editor) {
+      alert("This command is disabled");
+    }
+  });
+
+  // editor.runCommand("my-command-id");
+
+  blockManager.add("my-custom-block", {
+    label: "Simple block",
+    content: '<div class="my-block">This is my custom block</div>'
+  });
+
+  blockManager.get("my-custom-block").set({
+    label: "Updated simple block",
+    attributes: {
+      title: "My Title"
+    }
+  });
+
+  // blockManager.add("my-map-block", {
+  //   label: "Simple map block",
+  //   content: {
+  //     type: "map",
+  //     style: {
+  //       height: "350px"
+  //     },
+  //     removable: false
+  //   }
+  // });
+
+  //To add new asset for customization
+  am.add([
+    {
+      category: "c1",
+      src: "https://via.placeholder.com/150"
+    }
+  ]);
+  //Event listeners while upload
+  // The upload is started
+  editor.on("asset:upload:start", () => {
+    console.log("Upload Start");
+  });
+
+  // The upload is ended (completed or not)
+  editor.on("asset:upload:end", () => {
+    console.log("Upload End");
+  });
+
+  // Error handling
+  editor.on("asset:upload:error", err => {
+    console.log("Upload Error");
+  });
+
+  // Do something on response
+  editor.on("asset:upload:response", response => {
+    console.log("huha");
+  });
 }
 
 export default App;
