@@ -4,7 +4,7 @@ import "grapesjs/dist/css/grapes.min.css";
 import grapesjs from "grapesjs";
 import grapesjsPreset from "grapesjs-preset-webpage";
 import { assets } from "./assets";
-import grapesCkEditor from "grapesjs-plugin-ckeditor";
+// import grapesCkEditor from "grapesjs-plugin-ckeditor";
 
 function App() {
   let [id, setId] = useState("");
@@ -23,12 +23,12 @@ function App() {
       headers: {} // Custom headers for the remote storage request
     },
     panels: { defaults: [] },
-    plugins: [grapesjsPreset, grapesCkEditor],
-    pluginsOpts: {
-      "gjs-plugin-ckeditor": {
-        /* ...options */
-      }
-    },
+    plugins: [grapesjsPreset],
+    // pluginsOpts: {
+    //   "gjs-plugin-ckeditor": {
+    //     /* ...options */
+    //   }
+    // },
     assetManager: assets,
     allowScripts: 1
   });
@@ -58,11 +58,12 @@ function App() {
       name: "Element Attributes",
       open: true,
       properties: [{ name: "id" }, { name: "name" }, { name: "readOnly" }]
+      // buildProps: ['id', 'readOnly'],
     },
     { at: 0 }
   );
 
-  editor.addComponents('<script>alert("lodof")</script>');
+  // editor.addComponents('<script>alert("Hi There!")</script>');
 
   var pfx = editor.getConfig().stylePrefix;
   var modal = editor.Modal;
@@ -107,8 +108,8 @@ function App() {
         codeViewer.init(txtarea);
         viewer = codeViewer.editor;
       }
-      console.log(editor.getJs());
-      var InnerHtml = editor.getHtml();
+      // console.log(editor.getJs());
+      var InnerHtml = editor.getHtml();  
       var Css = editor.getCss();
       modal.setContent("");
       modal.setContent(container);
@@ -138,69 +139,6 @@ function App() {
     }
   });
 
-  // editor.runCommand("my-command-id");
-  var pfx = editor.getConfig().stylePrefix;
-  var cmdm = editor.Commands;
-  var codeViewer = editor.CodeManager.getViewer("CodeMirror").clone();
-  var pnm = editor.Panels;
-  var container = document.createElement("div");
-  var btnEdit = document.createElement("button");
-
-  codeViewer.set({
-    codeName: "htmlmixed",
-    readOnly: 0,
-    theme: "hopscotch",
-    autoBeautify: true,
-    autoCloseTags: true,
-    autoCloseBrackets: true,
-    lineWrapping: true,
-    styleActiveLine: true,
-    smartIndent: true,
-    indentWithTabs: true
-  });
-
-  btnEdit.innerHTML = "Edit";
-  btnEdit.className = pfx + "btn-prim " + pfx + "btn-import";
-  btnEdit.onclick = function() {
-    var code = codeViewer.editor.getValue();
-    editor.DomComponents.getWrapper().set("content", "");
-    editor.setComponents(code.trim());
-    modal.close();
-  };
-
-  cmdm.add("html-edit", {
-    run: function(editor, sender) {
-      sender && sender.set("active", 0);
-      var viewer = codeViewer.editor;
-      modal.setTitle("Edit code");
-      if (!viewer) {
-        var txtarea = document.createElement("textarea");
-        container.appendChild(txtarea);
-        container.appendChild(btnEdit);
-        codeViewer.init(txtarea);
-        viewer = codeViewer.editor;
-      }
-      var InnerHtml = editor.getHtml();
-      var Css = editor.getCss();
-      modal.setContent("");
-      modal.setContent(container);
-      codeViewer.setContent(InnerHtml + "<style>" + Css + "</style>");
-      modal.open();
-      viewer.refresh();
-    }
-  });
-
-  pnm.addButton("options", [
-    {
-      id: "edit",
-      className: "fa fa-edit",
-      command: "html-edit",
-      attributes: {
-        title: "Edit"
-      }
-    }
-  ]);
-
   blockManager.add("my-custom-block", {
     label: "Simple block",
     content: `
@@ -226,17 +164,6 @@ function App() {
     },
     resizable: true
   });
-
-  // blockManager.add("my-map-block", {
-  //   label: "Simple map block",
-  //   content: {
-  //     type: "map",
-  //     style: {
-  //       height: "350px"
-  //     },
-  //     removable: false
-  //   }
-  // });
 
   //To add new asset for customization
   am.add([
