@@ -8,6 +8,7 @@
     "@testing-library/user-event": "^7.2.1",
     "grapejs": "^2.1.2",
     "grapesjs": "^0.15.10",
+    "grapesjs-plugin-ckeditor": "0.0.9",
     "grapesjs-preset-webpage": "^0.1.11",
     "react": "^16.13.0",
     "react-dom": "^16.13.0",

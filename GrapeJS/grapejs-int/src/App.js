@@ -4,6 +4,7 @@ import "grapesjs/dist/css/grapes.min.css";
 import grapesjs from "grapesjs";
 import grapesjsPreset from "grapesjs-preset-webpage";
 import { assets } from "./assets";
+import grapesCkEditor from "grapesjs-plugin-ckeditor";
 
 function App() {
   const editor = grapesjs.init({
@@ -13,13 +14,81 @@ function App() {
     width: "auto",
     storageManager: false,
     panels: { defaults: [] },
-    plugins: [grapesjsPreset],
-    assetManager: assets
+    plugins: [grapesjsPreset, grapesCkEditor],
+    assetManager: assets,
+    allowScripts: 1
   });
   window.editor = editor;
   const am = editor.AssetManager;
   const blockManager = editor.BlockManager;
   const commands = editor.Commands;
+
+  editor.addComponents('<script>alert("lodof")</script>');
+
+  var pfx = editor.getConfig().stylePrefix;
+  var modal = editor.Modal;
+  var cmdm = editor.Commands;
+  var codeViewer = editor.CodeManager.getViewer("CodeMirror").clone();
+  var pnm = editor.Panels;
+  var container = document.createElement("div");
+  var btnEdit = document.createElement("button");
+
+  codeViewer.set({
+    codeName: "htmlmixed",
+    readOnly: 0,
+    theme: "hopscotch",
+    autoBeautify: true,
+    autoCloseTags: true,
+    autoCloseBrackets: true,
+    lineWrapping: true,
+    styleActiveLine: true,
+    smartIndent: true,
+    indentWithTabs: true
+  });
+
+  btnEdit.innerHTML = "Save";
+  btnEdit.className = pfx + "btn-prim " + pfx + "btn-import";
+  btnEdit.onclick = function() {
+    var code = codeViewer.editor.getValue();
+    editor.DomComponents.getWrapper().set("content", "");
+    editor.setComponents(code.trim());
+    modal.close();
+  };
+
+  cmdm.add("html-edit", {
+    run: function(editor, sender) {
+      sender && sender.set("active", 0);
+      var viewer = codeViewer.editor;
+
+      modal.setTitle("Edit code");
+      if (!viewer) {
+        var txtarea = document.createElement("textarea");
+        container.appendChild(txtarea);
+        container.appendChild(btnEdit);
+        codeViewer.init(txtarea);
+        viewer = codeViewer.editor;
+      }
+      console.log(editor.getJs());
+      var InnerHtml = editor.getHtml();
+      var Css = editor.getCss();
+      modal.setContent("");
+      modal.setContent(container);
+      codeViewer.setContent(InnerHtml + "<style>" + Css + "</style>");
+      modal.open();
+      viewer.refresh();
+    }
+  });
+
+  pnm.addButton("options", [
+    {
+      id: "edit",
+      className: "fa fa-edit",
+      command: "html-edit",
+      attributes: {
+        title: "Edit"
+      }
+    }
+  ]);
 
   commands.add("my-command-id", {
     run(editor) {
@@ -82,6 +151,12 @@ function App() {
   editor.on("asset:upload:response", response => {
     console.log("huha");
   });
+
+  return (
+    <>
+      <div id="editor"></div>
+    </>
+  );
 }
 
 export default App;
