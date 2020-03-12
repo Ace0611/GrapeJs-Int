@@ -15,6 +15,11 @@ function App() {
     storageManager: false,
     panels: { defaults: [] },
     plugins: [grapesjsPreset, grapesCkEditor],
+    pluginsOpts: {
+      "gjs-plugin-ckeditor": {
+        /* ...options */
+      }
+    },
     assetManager: assets,
     allowScripts: 1
   });
